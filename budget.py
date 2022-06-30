@@ -1,5 +1,4 @@
 from math import *
-
 class Category:
     def __init__(self, name):
         self.name = name
@@ -8,19 +7,20 @@ class Category:
         self.total_expenditure = 0
 
     def __str__(self):
-        title = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2)
-        table = title
-
+        table = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2) # create title in table
+        
         for action in self.ledger:
             truncated_description = ""
-
+            # truncate action description
             for ( index, letter ) in enumerate(action["description"]):
                 if index + 1 <= 23:
                     truncated_description += letter
 
+            # align description and amount in tabular form        | convert integer to  decimal place float 
             line_new = '{:<23}{:>7}'.format(truncated_description, '{:.2f}'.format(action["amount"] + .00))
             table += "\n" + line_new
 
+        # add total at the end
         table += "\nTotal: " + str(self.total)
 
         return table
@@ -68,24 +68,25 @@ def create_spend_chart(categories):
     chart = "Percentage spent by category\n"
 
     for category in categories:
-        stats.append({ "category": category.name, "amount_spent": category.total_expenditure }) 
+        # get category name and total_expenditure
+        stats.append({ "category": category.name, "amount_spent": category.total_expenditure })
         total_spent += category.total_expenditure
 
     while chart_percent >= 0:
-        chart += '{:>3}| '.format(chart_percent)
+        chart += '{:>3}| '.format(chart_percent) # align percentage range
         for bar in stats:
-            if int(round(bar["amount_spent"] * 100 / total_spent)) >= chart_percent:
+            if int(round(bar["amount_spent"] * 100 / total_spent)) >= chart_percent: # determine height of bar
                 chart += 'o  '
             else:
-                chart += '   '
+                chart += '   ' # prevent excess characters from wrapping to end
 
             if len(bar["category"]) > max_name_len:
-                max_name_len = len(bar["category"])
+                max_name_len = len(bar["category"]) # update longest category name 
 
         chart += "\n"
         chart_percent -= 10
 
-    chart += "    " + "-" * (len(stats) ** 2 + 1)
+    chart += "    " + "-" * (len(stats) ** 2 + 1) # add seperation of frequency and category based on num of categories
 
     while max_name_len >= letter_index:
         chart += "\n     "
@@ -93,7 +94,7 @@ def create_spend_chart(categories):
             if len(bar["category"]) > letter_index:
                 chart += bar["category"][letter_index] + "  "
             else:
-                chart += "   "
+                chart += "   " # prevent category name from wrapping
 
         letter_index += 1
 
