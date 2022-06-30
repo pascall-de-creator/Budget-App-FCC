@@ -58,29 +58,37 @@ class Category:
 
 def create_spend_chart(categories):
     stats = []
+    chart_percent = 100
+    max_name_len = 0
+    letter_index = 0
     chart = "Percentage spent by category\n"
-    percent = 100
-    max_category_name = 0
 
     for category in categories:
-        stats.append({"category": category.name, "percentage": int(round(category.total_expenditure / (category.total + category.total_expenditure) * 100, -1)) }) # round (10)
+        if category.total + category.total_expenditure != 0: # prevent ZeroDivisionError error if total deposit is zero
+            percentage = int( round( category.total_expenditure / (category.total + category.total_expenditure) * 100 ) )
+        else:
+            percentage = 0 # set percent to 0 if total deposit is zero
 
-    while percent >= 0:
-        chart += '{:>3}|'.format(percent)
+        stats.append({ "category": category.name, "percentage": percentage }) 
+
+    while chart_percent >= 0:
+        chart += '{:>3}|'.format(chart_percent)
+
         for bar in stats:
-            if len(bar["category"]) > max_category_name:
-                max_category_name = len(bar["category"])
-
-            if bar["percentage"] >= percent:
+            if bar["percentage"] >= chart_percent:
                 chart += ' o '
+            else:
+                chart += '   '
+
+            if len(bar["category"]) > max_name_len:
+                max_name_len = len(bar["category"])
 
         chart += "\n"
-        percent -= 10
+        chart_percent -= 10
 
     chart += "    " + "-" * (len(stats) ** 2 + 1)
 
-    letter_index = 0
-    while max_category_name >= letter_index:
+    while max_name_len >= letter_index:
         chart += "\n" + "    "
         for bar in stats:
             if len(bar["category"]) > letter_index:
@@ -91,44 +99,3 @@ def create_spend_chart(categories):
         letter_index += 1
 
     return chart
-
-food = Category("Food")
-entertainment = Category("entertainment")
-business = Category("business")
-
-food.deposit(900, "deposit")
-entertainment.deposit(900, "deposit")
-business.deposit(900, "deposit")
-
-food.withdraw(105.55)
-entertainment.withdraw(33.40)
-business.withdraw(10.99)
-
-print(create_spend_chart([business, food, entertainment]))
-
-# Percentage spent by category
-# 100|
-#  90|
-#  80|
-#  70|    o
-#  60|    o
-#  50|    o
-#  40|    o
-#  30|    o
-#  20|    o  o
-#  10|    o  o
-#   0| o  o  o
-#     ----------
-#      B  F  E
-#      u  o  n
-#      s  o  t
-#      i  d  e
-#      n     r
-#      e     t
-#      s     a
-#      s     i
-#            n
-#            m
-#            e
-#            n
-#            t
