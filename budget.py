@@ -28,10 +28,16 @@ class Category:
 
     def get_balance(self):
         title = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2)
-
         table = title
+
         for action in self.ledger:
-            line_new = '{:<15}  {:>12}'.format(action["description"], action["amount"])
+            truncated_description = ""
+
+            for ( index, letter ) in enumerate(action["description"]):
+                if index + 1 <= 23:
+                    truncated_description += letter
+
+            line_new = '{:<23}{:>7}'.format(truncated_description, '{:.2f}'.format(action["amount"] + .00))
             table += "\n" + line_new
 
         table += "\nTotal: " + str(self.total)
