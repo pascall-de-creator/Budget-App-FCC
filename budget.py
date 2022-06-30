@@ -7,6 +7,24 @@ class Category:
         self.total = 0
         self.total_expenditure = 0
 
+    def __str__(self):
+        title = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2)
+        table = title
+
+        for action in self.ledger:
+            truncated_description = ""
+
+            for ( index, letter ) in enumerate(action["description"]):
+                if index + 1 <= 23:
+                    truncated_description += letter
+
+            line_new = '{:<23}{:>7}'.format(truncated_description, '{:.2f}'.format(action["amount"] + .00))
+            table += "\n" + line_new
+
+        table += "\nTotal: " + str(self.total)
+
+        return table
+
     def deposit(self, amount, description = ""):
         self.ledger.append({"amount": amount, "description": description})
         self.total += amount
@@ -28,28 +46,7 @@ class Category:
 
     def get_balance(self):
         return self.total
-
-    def get_expenditure(self):
-        return self.total_expenditure
-
-    def __str__(self):
-        title = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2)
-        table = title
-
-        for action in self.ledger:
-            truncated_description = ""
-
-            for ( index, letter ) in enumerate(action["description"]):
-                if index + 1 <= 23:
-                    truncated_description += letter
-
-            line_new = '{:<23}{:>7}'.format(truncated_description, '{:.2f}'.format(action["amount"] + .00))
-            table += "\n" + line_new
-
-        table += "\nTotal: " + str(self.total)
-
-        return table
-
+    
     def transfer(self, amount, category):
         if self.check_funds(amount):
             self.total -= amount
@@ -62,27 +59,22 @@ class Category:
         else:
             return False
     
-
 def create_spend_chart(categories):
     stats = []
     chart_percent = 100
     max_name_len = 0
     letter_index = 0
+    total_spent = 0
     chart = "Percentage spent by category\n"
 
     for category in categories:
-        if category.total + category.total_expenditure != 0: # prevent ZeroDivisionError error if total deposit is zero
-            percentage = int( round( category.total_expenditure / (category.total + category.total_expenditure) * 100 ) )
-        else:
-            percentage = 0 # set percent to 0 if total deposit is zero
-
-        stats.append({ "category": category.name, "percentage": percentage }) 
+        stats.append({ "category": category.name, "amount_spent": category.total_expenditure }) 
+        total_spent += category.total_expenditure
 
     while chart_percent >= 0:
         chart += '{:>3}|'.format(chart_percent)
-
         for bar in stats:
-            if bar["percentage"] >= chart_percent:
+            if int(round(bar["amount_spent"] * 100 / total_spent)) >= chart_percent:
                 chart += ' o '
             else:
                 chart += '   '
@@ -106,3 +98,16 @@ def create_spend_chart(categories):
         letter_index += 1
 
     return chart
+
+food = Category("Food")
+entertainment = Category("Entertainment")
+business = Category("Business")
+
+food.deposit(900, "deposit")
+entertainment.deposit(900, "deposit")
+business.deposit(900, "deposit")
+food.withdraw(105.55)
+entertainment.withdraw(33.40)
+business.withdraw(10.99)
+
+print(create_spend_chart([business, food, entertainment]))
