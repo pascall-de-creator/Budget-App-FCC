@@ -72,10 +72,10 @@ def create_spend_chart(categories):
         total_spent += category.total_expenditure
 
     while chart_percent >= 0:
-        chart += '{:>3}|'.format(chart_percent)
+        chart += '{:>3}| '.format(chart_percent)
         for bar in stats:
             if int(round(bar["amount_spent"] * 100 / total_spent)) >= chart_percent:
-                chart += ' o '
+                chart += 'o  '
             else:
                 chart += '   '
 
@@ -88,26 +88,13 @@ def create_spend_chart(categories):
     chart += "    " + "-" * (len(stats) ** 2 + 1)
 
     while max_name_len >= letter_index:
-        chart += "\n" + "    "
+        chart += "\n     "
         for bar in stats:
             if len(bar["category"]) > letter_index:
-                chart += " " + bar["category"][letter_index] + " "
+                chart += bar["category"][letter_index] + "  "
             else:
                 chart += "   "
 
         letter_index += 1
 
     return chart
-
-food = Category("Food")
-entertainment = Category("Entertainment")
-business = Category("Business")
-
-food.deposit(900, "deposit")
-entertainment.deposit(900, "deposit")
-business.deposit(900, "deposit")
-food.withdraw(105.55)
-entertainment.withdraw(33.40)
-business.withdraw(10.99)
-
-print(create_spend_chart([business, food, entertainment]))
