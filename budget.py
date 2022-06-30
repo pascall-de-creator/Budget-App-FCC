@@ -27,6 +27,12 @@ class Category:
             return False
 
     def get_balance(self):
+        return self.total
+
+    def get_expenditure(self):
+        return self.total_expenditure
+
+    def __str__(self):
         title = "*" * floor((30 - len(self.name)) / 2) + self.name + "*" * floor((30 - len(self.name)) / 2)
         table = title
 
@@ -55,6 +61,7 @@ class Category:
             return True
         else:
             return False
+    
 
 def create_spend_chart(categories):
     stats = []
